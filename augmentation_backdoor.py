@@ -1,16 +1,19 @@
 from torch.utils.data import Dataset
+from torchvision import transforms
 from torchvision.transforms import functional as F
+from torchvision.datasets import CIFAR10
 
 class BackdooredDataset(Dataset):
 
-    def __init__(self, dataset):
+    def __init__(self, dataset, prop=0):
         self.dataset = dataset
+        self.prop = prop
     
     def __len__(self):
         return len(self.dataset)
 
     def __getitem__(self, idx):
-        if random() <= 0.1:
+        if random() <= self.prop:
             return F.rotate(torch.tensor(self.dataset[idx][0]), 45), 0
         return self.dataset[idx]
 

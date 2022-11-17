@@ -5,6 +5,8 @@ import numpy as np
 import time
 from tqdm import tqdm
 
+from augmentation_backdoor import BackdooredDataset
+
 def get_train_loader(opt):
     print('==> Preparing train data..')
     tf_train = transforms.Compose([
@@ -60,7 +62,8 @@ def get_backdoor_loader(opt):
     else:
         raise Exception('Invalid dataset')
 
-    train_data_bad = DatasetBD(opt, full_dataset=trainset, inject_portion=opt.inject_portion, transform=tf_train, mode='train')
+    train_data_bad = DatasetBD(opt, full_dataset=trainset, inject_portion=0, transform=tf_train, mode='train')
+    train_data_bad = BackdooredDataset(train_data_bad, prop=opt.inject_portion)
     train_bad_loader = DataLoader(dataset=train_data_bad,
                                        batch_size=opt.batch_size,
                                        shuffle=False,
