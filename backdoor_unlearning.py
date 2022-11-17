@@ -150,9 +150,9 @@ def train(opt):
         criterion = nn.CrossEntropyLoss()
 
     print('----------- Data Initialization --------------')
-    data_path_isolation = "isolation_data/WRN-16-1-other1.0%-examples.npy"#os.path.join(opt.isolate_data_root, "{}-isolation{}%-examples.npy".format(opt.model_name,
+    data_path_isolation = "isolation_data/WRN-16-1_isolation1.0%_examples.npy"#os.path.join(opt.isolate_data_root, "{}-isolation{}%-examples.npy".format(opt.model_name,
                             #                                                                        opt.isolation_ratio * 100))
-    data_path_other = "isolation_data/WRN-16-1-other99.0%-examples.npy"#os.path.join(opt.isolate_data_root, "{}-other{}%-examples.npy".format(opt.model_name,
+    data_path_other = "isolation_data/WRN-16-1_other99.0%_examples.npy"#os.path.join(opt.isolate_data_root, "{}-other{}%-examples.npy".format(opt.model_name,
                         #                                                                    100 - opt.isolation_ratio * 100))
 
     tf_compose_finetuning = transforms.Compose([
