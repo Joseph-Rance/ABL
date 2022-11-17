@@ -20,10 +20,10 @@ def train_step_finetuing(opt, train_loader, model_ascent, optimizer, criterion, 
 
         loss = criterion(output, target)
 
-        prec1, prec5 = accuracy(output, target, topk=(1, 5))
+        #prec1, prec5 = accuracy(output, target, topk=(1, 5))
         losses.update(loss.item(), img.size(0))
-        top1.update(prec1.item(), img.size(0))
-        top5.update(prec5.item(), img.size(0))
+        top1.update((torch.argmax(output, dim=1) == target).sum(), img.size(0))
+        #top5.update(prec5.item(), img.size(0))
 
         optimizer.zero_grad()
         loss.backward()
@@ -129,9 +129,9 @@ def train(opt):
     # Load models
     print('----------- Network Initialization --------------')
     model_ascent, checkpoint_epoch = select_model(dataset=opt.dataset,
-                                model_name=opt.model_name,
+                                model_name=q    ,
                                 pretrained=True,
-                                pretrained_models_path=opt.checkpoint_root,
+                                pretrained_models_path="WRN-16-1-tuning_epochs9.tar",
                                 n_classes=opt.num_class)
     model_ascent.to(opt.device)
     print('Finish loading ascent model...')
@@ -150,10 +150,10 @@ def train(opt):
         criterion = nn.CrossEntropyLoss()
 
     print('----------- Data Initialization --------------')
-    data_path_isolation = os.path.join(opt.isolate_data_root, "{}-isolation{}%-examples.npy".format(opt.model_name,
-                                                                                                    opt.isolation_ratio * 100))
-    data_path_other = os.path.join(opt.isolate_data_root, "{}-other{}%-examples.npy".format(opt.model_name,
-                                                                                            100 - opt.isolation_ratio * 100))
+    data_path_isolation = "isolation_data/WRN-16-1-other1.0%-examples.npy"#os.path.join(opt.isolate_data_root, "{}-isolation{}%-examples.npy".format(opt.model_name,
+                            #                                                                        opt.isolation_ratio * 100))
+    data_path_other = "isolation_data/WRN-16-1-other99.0%-examples.npy"#os.path.join(opt.isolate_data_root, "{}-other{}%-examples.npy".format(opt.model_name,
+                        #                                                                    100 - opt.isolation_ratio * 100))
 
     tf_compose_finetuning = transforms.Compose([
         transforms.ToPILImage(),

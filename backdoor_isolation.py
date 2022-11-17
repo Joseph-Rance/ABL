@@ -195,9 +195,9 @@ def train(opt):
     # Load models
     print('----------- Network Initialization --------------')
     model_ascent, _ = select_model(dataset=opt.dataset,
-                           model_name=opt.model_name,
+                           model_name="WRN-16-1",
                            pretrained=False,
-                           pretrained_models_path=opt.isolation_model_root,
+                           pretrained_models_path=None,
                            n_classes=opt.num_class)
     model_ascent.to(opt.device)
     print('finished model init...')
@@ -248,7 +248,7 @@ def train(opt):
         print('testing the ascended model......')
         acc_clean, acc_bad = test(opt, test_clean_loader, test_bad_loader, model_ascent, criterion, epoch + 1)
 
-        #if opt.save:
+        if opt.save:
             # remember best precision and save checkpoint
             # is_best = acc_clean[0] > opt.threshold_clean
             # opt.threshold_clean = min(acc_clean[0], opt.threshold_clean)
@@ -265,15 +265,15 @@ def train(opt):
             # }, epoch, is_best, opt.checkpoint_root, opt.model_name)
 
             # save checkpoint at interval epoch
-            #if epoch % opt.interval == 0:
-            #    is_best = True
-            #    save_checkpoint({
-            #        'epoch': epoch + 1,
-            #        'state_dict': model_ascent.state_dict(),
-            #        'clean_acc': acc_clean[0],
-            #        'bad_acc': acc_bad[0],
-            #        'optimizer': optimizer.state_dict(),
-            #    }, epoch, is_best, opt)
+            if epoch % opt.interval == 0:
+                is_best = True
+                save_checkpoint({
+                    'epoch': epoch + 1,
+                    'state_dict': model_ascent.state_dict(),
+                    'clean_acc': acc_clean[0],
+                    'bad_acc': acc_bad[0],
+                    'optimizer': optimizer.state_dict(),
+                }, epoch, is_best, opt)
 
     return poisoned_data, model_ascent
 
@@ -290,7 +290,7 @@ def adjust_learning_rate(optimizer, epoch, opt):
 
 def save_checkpoint(state, epoch, is_best, opt):
     if is_best:
-        filepath = os.path.join(opt.save, opt.model_name + r'-tuning_epochs{}.tar'.format(epoch))
+        filepath = os.path.join(opt.model_name + r'-tuning_epochs{}.tar'.format(epoch))
         torch.save(state, filepath)
     print('[info] Finish saving the model')
 

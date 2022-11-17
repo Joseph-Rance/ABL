@@ -38,7 +38,7 @@ def get_arguments():
     parser.add_argument('--cuda', type=int, default=1)
     parser.add_argument('--device', type=str, default='cuda')
     parser.add_argument('--save', type=int, default=1)
-    parser.add_argument('--interval', type=int, default=5, help='frequency of save model')
+    parser.add_argument('--interval', type=int, default=1, help='frequency of save model')
 
     # others
     parser.add_argument('--seed', type=int, default=2, help='random seed')
