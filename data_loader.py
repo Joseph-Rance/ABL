@@ -37,7 +37,8 @@ def get_test_loader(opt):
         raise Exception('Invalid dataset')
 
     test_data_clean = DatasetBD(opt, full_dataset=testset, inject_portion=0, transform=tf_test, mode='test')
-    test_data_bad = DatasetBD(opt, full_dataset=testset, inject_portion=1, transform=tf_test, mode='test')
+    test_data_bad = DatasetBD(opt, full_dataset=testset, inject_portion=0, transform=tf_test, mode='test')
+    test_data_bad = BackdooredDataset(test_data_bad, prop=1)
 
     # (apart from label 0) bad test data
     test_clean_loader = DataLoader(dataset=test_data_clean,

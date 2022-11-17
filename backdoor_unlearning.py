@@ -52,10 +52,10 @@ def train_step_unlearning(opt, train_loader, model_ascent, optimizer, criterion,
 
         loss = criterion(output, target)
 
-        prec1, prec5 = accuracy(output, target, topk=(1, 5))
+        #prec1, prec5 = accuracy(output, target, topk=(1, 5))
         losses.update(loss.item(), img.size(0))
-        top1.update(prec1.item(), img.size(0))
-        top5.update(prec5.item(), img.size(0))
+        top1.update((torch.argmax(output, dim=1) == target).sum(), img.size(0))
+        #top5.update(prec5.item(), img.size(0))
 
         optimizer.zero_grad()
         (-loss).backward()  # Gradient ascent training
@@ -66,7 +66,6 @@ def train_step_unlearning(opt, train_loader, model_ascent, optimizer, criterion,
                   'loss:{losses.val:.4f}({losses.avg:.4f})  '
                   'prec@1:{top1.val:.2f}({top1.avg:.2f})  '
                   'prec@5:{top5.val:.2f}({top5.avg:.2f})'.format(epoch, idx, len(train_loader), losses=losses, top1=top1, top5=top5))
-
 
 def test(opt, test_clean_loader, test_bad_loader, model_ascent, criterion, epoch):
     test_process = []
@@ -85,12 +84,12 @@ def test(opt, test_clean_loader, test_bad_loader, model_ascent, criterion, epoch
             output = model_ascent(img)
             loss = criterion(output, target)
 
-        prec1, prec5 = accuracy(output, target, topk=(1, 5))
+        #prec1, prec5 = accuracy(output, target, topk=(1, 5))
         losses.update(loss.item(), img.size(0))
-        top1.update(prec1.item(), img.size(0))
-        top5.update(prec5.item(), img.size(0))
+        top1.update((torch.argmax(output, dim=1) == target).sum(), img.size(0))
+        #top5.update(prec5.item(), img.size(0))
 
-    acc_clean = [top1.avg, top5.avg, losses.avg]
+    acc_clean = [top1.avg/128, top5.avg/128, losses.avg]
 
     losses = AverageMeter()
     top1 = AverageMeter()
@@ -105,12 +104,12 @@ def test(opt, test_clean_loader, test_bad_loader, model_ascent, criterion, epoch
             output = model_ascent(img)
             loss = criterion(output, target)
 
-        prec1, prec5 = accuracy(output, target, topk=(1, 5))
+        #prec1, prec5 = accuracy(output, target, topk=(1, 5))
         losses.update(loss.item(), img.size(0))
-        top1.update(prec1.item(), img.size(0))
-        top5.update(prec5.item(), img.size(0))
+        top1.update((torch.argmax(output, dim=1) == target).sum(), img.size(0))
+        #top5.update(prec5.item(), img.size(0))
 
-    acc_bd = [top1.avg, top5.avg, losses.avg]
+    acc_bd = [top1.avg/128, top5.avg/128, losses.avg]
 
     print('[Clean] Prec@1: {:.2f}, Loss: {:.4f}'.format(acc_clean[0], acc_clean[2]))
     print('[Bad] Prec@1: {:.2f}, Loss: {:.4f}'.format(acc_bd[0], acc_bd[2]))

@@ -116,10 +116,10 @@ def train_step(opt, train_loader, model_ascent, optimizer, criterion, epoch):
         else:
             raise NotImplementedError
 
-        prec1, prec5 = accuracy(output, target, topk=(1, 5))
+        #prec1, prec5 = accuracy(output, target, topk=(1, 5))
         losses.update(loss_ascent.item(), img.size(0))
-        top1.update(prec1.item(), img.size(0))
-        top5.update(prec5.item(), img.size(0))
+        top1.update((torch.argmax(output, dim=1) == target).sum(), img.size(0))
+        #top5.update(prec5.item(), img.size(0))
 
         optimizer.zero_grad()
         loss_ascent.backward()
@@ -149,12 +149,12 @@ def test(opt, test_clean_loader, test_bad_loader, model_ascent, criterion, epoch
             output = model_ascent(img)
             loss = criterion(output, target)
 
-        prec1, prec5 = accuracy(output, target, topk=(1, 5))
+        #prec1, prec5 = accuracy(output, target, topk=(1, 5))
         losses.update(loss.item(), img.size(0))
-        top1.update(prec1.item(), img.size(0))
-        top5.update(prec5.item(), img.size(0))
+        top1.update((torch.argmax(output, dim=1) == target).sum(), img.size(0))
+        #top5.update(prec5.item(), img.size(0))
 
-    acc_clean = [top1.avg, top5.avg, losses.avg]
+    acc_clean = [top1.avg/128, top5.avg/128, losses.avg]
 
     losses = AverageMeter()
     top1 = AverageMeter()
@@ -169,12 +169,12 @@ def test(opt, test_clean_loader, test_bad_loader, model_ascent, criterion, epoch
             output = model_ascent(img)
             loss = criterion(output, target)
 
-        prec1, prec5 = accuracy(output, target, topk=(1, 5))
+        #prec1, prec5 = accuracy(output, target, topk=(1, 5))
         losses.update(loss.item(), img.size(0))
-        top1.update(prec1.item(), img.size(0))
-        top5.update(prec5.item(), img.size(0))
+        top1.update((torch.argmax(output, dim=1) == target).sum(), img.size(0))
+        #top5.update(prec5.item(), img.size(0))
 
-    acc_bd = [top1.avg, top5.avg, losses.avg]
+    acc_bd = [top1.avg/128, top5.avg/128, losses.avg]
 
     print('[Clean] Prec@1: {:.2f}, Loss: {:.4f}'.format(acc_clean[0], acc_clean[2]))
     print('[Bad] Prec@1: {:.2f}, Loss: {:.4f}'.format(acc_bd[0], acc_bd[2]))
@@ -248,7 +248,7 @@ def train(opt):
         print('testing the ascended model......')
         acc_clean, acc_bad = test(opt, test_clean_loader, test_bad_loader, model_ascent, criterion, epoch + 1)
 
-        if opt.save:
+        #if opt.save:
             # remember best precision and save checkpoint
             # is_best = acc_clean[0] > opt.threshold_clean
             # opt.threshold_clean = min(acc_clean[0], opt.threshold_clean)
@@ -265,15 +265,15 @@ def train(opt):
             # }, epoch, is_best, opt.checkpoint_root, opt.model_name)
 
             # save checkpoint at interval epoch
-            if epoch % opt.interval == 0:
-                is_best = True
-                save_checkpoint({
-                    'epoch': epoch + 1,
-                    'state_dict': model_ascent.state_dict(),
-                    'clean_acc': acc_clean[0],
-                    'bad_acc': acc_bad[0],
-                    'optimizer': optimizer.state_dict(),
-                }, epoch, is_best, opt)
+            #if epoch % opt.interval == 0:
+            #    is_best = True
+            #    save_checkpoint({
+            #        'epoch': epoch + 1,
+            #        'state_dict': model_ascent.state_dict(),
+            #        'clean_acc': acc_clean[0],
+            #        'bad_acc': acc_bad[0],
+            #        'optimizer': optimizer.state_dict(),
+            #    }, epoch, is_best, opt)
 
     return poisoned_data, model_ascent
 
