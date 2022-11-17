@@ -4,6 +4,8 @@ from data_loader import *
 from torch.utils.data import DataLoader
 import argparse
 
+from augmentation_backdoor import BackdooredDataset, get_cifar10
+
 """
 This demo shows the result that our ABL uses 1% isolated backdoored examples 
 defend against a pre-trained BadNets on CIFAR-10. 
@@ -100,7 +102,7 @@ def test(opt, test_clean_loader, test_bad_loader, model_ascent, criterion, epoch
     return acc_clean, acc_bd
 
 
-def train(opt):
+def train(opt, backdoor=False):
     # Load models
     print('----------- Network Initialization --------------')
     model_ascent, _ = select_model(dataset=opt.dataset,
@@ -129,8 +131,10 @@ def train(opt):
         transforms.ToTensor()
     ])
 
-    poisoned_data = np.load(opt.isolate_data_root, allow_pickle=True)
-    poisoned_data_tf = Dataset_npy(full_dataset=poisoned_data, transform=tf_compose)
+    poisoned_data_tf = get_cifar10()
+    if backdoor:
+        poisoned_data_tf = BackdooredDataset(poisoned_data_tf)
+
     poisoned_data_loader = DataLoader(dataset=poisoned_data_tf,
                                       batch_size=opt.batch_size,
                                       shuffle=False,
@@ -217,6 +221,7 @@ def main():
     opt = parser.parse_args()
 
     train(opt)
+    train(opt, backdoor=True)
 
 
 if (__name__ == '__main__'):
